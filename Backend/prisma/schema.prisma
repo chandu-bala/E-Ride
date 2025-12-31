@@ -1,14 +1,166 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema for VoltRide backend
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =======================
+//  USER (PASSENGER)
+//   ======================= */
+
+model User {
+  id           String   @id @default(uuid())
+  name         String?
+  phoneNumber  String   @unique
+  lastKnownLat Float?
+  lastKnownLng Float?
+  createdAt    DateTime @default(now())
+
+  rideRequests RideRequest[]
+  rides        Ride[]
+}
+
+// =======================
+//   CAPTAIN (DRIVER)
+//   ======================= */
+
+model Captain {
+  id             String   @id @default(uuid())
+  name           String
+  phoneNumber    String   @unique
+  isOnline       Boolean  @default(false)
+  batteryPercent Int?
+  totalIncome    Float    @default(0)
+  totalTrips     Int      @default(0)
+  cancelledTrips Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  vehicle   Vehicle?
+  rides     Ride[]
+  locations CaptainLocation[]
+  earnings  CaptainEarning[]
+}
+
+// =======================
+// VEHICLE
+//====================== */
+
+model Vehicle {
+  id              String    @id @default(uuid())
+  captainId       String    @unique
+  registrationNo  String
+  vehicleType     String
+  batteryCapacity Int?
+  lastServiceDate DateTime?
+
+  captain Captain @relation(fields: [captainId], references: [id])
+}
+
+// =======================
+// RIDE REQUEST
+// ======================= */
+
+model RideRequest {
+  id                String            @id @default(uuid())
+  userId            String
+  pickupLat         Float
+  pickupLng         Float
+  dropLat           Float
+  dropLng           Float
+  estimatedDistance Float
+  estimatedFare     Float
+  status            RideRequestStatus @default(PENDING)
+  createdAt         DateTime          @default(now())
+
+  user User  @relation(fields: [userId], references: [id])
+  ride Ride?
+}
+
+// =======================
+//   RIDE
+//   ======================= */
+
+model Ride {
+  id             String     @id @default(uuid())
+  rideRequestId  String     @unique
+  userId         String
+  captainId      String
+  otp            String
+  startTime      DateTime?
+  endTime        DateTime?
+  actualDistance Float?
+  finalFare      Float?
+  status         RideStatus @default(ASSIGNED)
+
+  user         User              @relation(fields: [userId], references: [id])
+  captain      Captain           @relation(fields: [captainId], references: [id])
+  rideRequest  RideRequest       @relation(fields: [rideRequestId], references: [id])
+  cancellation RideCancellation?
+}
+
+// =======================
+//  LOCATION LOGS
+//  ======================= */
+
+model CaptainLocation {
+  id        String   @id @default(uuid())
+  captainId String
+  lat       Float
+  lng       Float
+  timestamp DateTime @default(now())
+
+  captain Captain @relation(fields: [captainId], references: [id])
+}
+
+// =======================
+//   EARNINGS
+//   ======================= */
+
+model CaptainEarning {
+  id        String   @id @default(uuid())
+  captainId String
+  rideId    String
+  amount    Float
+  date      DateTime @default(now())
+
+  captain Captain @relation(fields: [captainId], references: [id])
+}
+
+// =======================
+//  CANCELLATION
+//  ======================= */
+
+model RideCancellation {
+  id          String      @id @default(uuid())
+  rideId      String      @unique
+  cancelledBy CancelledBy
+  reason      String?
+  timestamp   DateTime    @default(now())
+
+  ride Ride @relation(fields: [rideId], references: [id])
+}
+
+// ======================= ENUMS======================= */
+
+enum RideRequestStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+enum RideStatus {
+  ASSIGNED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum CancelledBy {
+  USER
+  CAPTAIN
 }
