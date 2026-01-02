@@ -30,20 +30,30 @@ model User {
 //   ======================= */
 
 model Captain {
-  id             String   @id @default(uuid())
-  name           String
-  phoneNumber    String   @unique
-  isOnline       Boolean  @default(false)
-  batteryPercent Int?
-  totalIncome    Float    @default(0)
-  totalTrips     Int      @default(0)
-  cancelledTrips Int      @default(0)
-  createdAt      DateTime @default(now())
+  id               String   @id @default(uuid())
+  name             String
+  phoneNumber      String   @unique
 
-  vehicle   Vehicle?
-  rides     Ride[]
-  locations CaptainLocation[]
-  earnings  CaptainEarning[]
+  // Onboarding details
+  licenseNumber    String
+  licenseImageUrl  String
+  vehicleNumber    String
+  termsAccepted    Boolean  @default(false)
+
+  // Status & stats
+  isOnline         Boolean  @default(false)
+  batteryPercent   Int?
+  totalIncome      Float    @default(0)
+  totalTrips       Int      @default(0)
+  cancelledTrips   Int      @default(0)
+
+  createdAt        DateTime @default(now())
+
+  // Relations
+  vehicle          Vehicle?
+  rides            Ride[]
+  locations        CaptainLocation[]
+  earnings         CaptainEarning[]
 }
 
 // =======================
