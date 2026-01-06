@@ -34,11 +34,15 @@ model Captain {
   name             String
   phoneNumber      String   @unique
 
-  // Onboarding details
+  // Onboarding
   licenseNumber    String
   licenseImageUrl  String
   vehicleNumber    String
   termsAccepted    Boolean  @default(false)
+
+  // LIVE LOCATION (ADD THESE 👇)
+  lastKnownLat     Float?
+  lastKnownLng     Float?
 
   // Status & stats
   isOnline         Boolean  @default(false)
@@ -49,12 +53,12 @@ model Captain {
 
   createdAt        DateTime @default(now())
 
-  // Relations
   vehicle          Vehicle?
   rides            Ride[]
   locations        CaptainLocation[]
   earnings         CaptainEarning[]
 }
+
 
 // =======================
 // VEHICLE
@@ -82,6 +86,7 @@ model RideRequest {
   pickupLng         Float
   dropLat           Float
   dropLng           Float
+  passengerCount    Int      @default(1)
   estimatedDistance Float
   estimatedFare     Float
   status            RideRequestStatus @default(PENDING)

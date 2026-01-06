@@ -6,6 +6,9 @@ import { authMiddleware } from "./middlewares/auth.middleware.js";
 import captainRoutes from "./modules/captians/captain.routes.js";
 
 import captainAuthRoutes from "./modules/captians/auth/captainAuth.routes.js";
+import captainLocationRoutes from "./modules/captians/location/captainLocation.routes.js";
+import rideRoutes from "./modules/rides/ride.routes.js";
+import matchingRoutes from "./modules/matching/matching.routes.js";
 
 
 const app = express();
@@ -17,7 +20,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/captains/auth", captainAuthRoutes);
 
 app.use("/api/captains", captainRoutes);
-
+app.use("/api/captains", captainLocationRoutes);
+app.use("/api/rides", rideRoutes);
+app.use("/api/matching", matchingRoutes);
 
 app.get("/api/protected", authMiddleware, (req, res) => {
   res.json({
