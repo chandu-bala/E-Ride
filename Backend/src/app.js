@@ -10,6 +10,7 @@ import captainLocationRoutes from "./modules/captians/location/captainLocation.r
 import rideRoutes from "./modules/rides/ride.routes.js";
 import matchingRoutes from "./modules/matching/matching.routes.js";
 import rideAcceptanceRoutes from "./modules/rides/rideAcceptance.routes.js";
+import rideOtpRoutes from "./modules/rides/rideOtp.routes.js";
 
 
 const app = express();
@@ -25,6 +26,8 @@ app.use("/api/captains", captainLocationRoutes);
 app.use("/api/rides", rideRoutes);
 app.use("/api/matching", matchingRoutes);
 app.use("/api/rides", rideAcceptanceRoutes);
+app.use("/api/rides", rideOtpRoutes);
+
 
 
 app.get("/api/protected", authMiddleware, (req, res) => {
